@@ -7,6 +7,9 @@ import type { DatosCliente, HallazgoResearch, BloqueVSL, ResultadoAuditoria } fr
 import { buildVslPrompt } from '@/lib/prompts';
 import { auditarVSL, buildRefinementPrompt } from '@/lib/auditor';
 import { obtenerContextoHistorico, registrarAprendizaje } from '@/lib/memory';
+import { generateObject } from 'ai';
+import { google } from '@ai-sdk/google';
+import { z } from 'zod';
 
 const MAX_ITERACIONES_REFINAMIENTO = 2;
 
@@ -16,8 +19,8 @@ export async function POST(req: NextRequest) {
       datosCliente: DatosCliente;
     };
 
-    const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
-    const esDemo = !INSFORGE_API_KEY || INSFORGE_API_KEY === 'your_insforge_api_key_here';
+    const GOOGLE_API_KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    const esDemo = !GOOGLE_API_KEY;
 
     // ── PASO 1: Generación inicial del VSL ──────────────────────────────────
     let bloques: BloqueVSL[];
@@ -25,11 +28,11 @@ export async function POST(req: NextRequest) {
     if (esDemo) {
       bloques = generarGuionDemo(datosCliente);
     } else {
-      bloques = await generarConIA(datosCliente, INSFORGE_API_KEY);
+      bloques = await generarConIA(datosCliente);
     }
 
     // ── PASO 2: Auditoría interna (Sistema Ouroboros) ───────────────────────
-    let auditoria = await auditarVSL(bloques, datosCliente, INSFORGE_API_KEY);
+    let auditoria = await auditarVSL(bloques, datosCliente, GOOGLE_API_KEY);
     let iteraciones = 0;
 
     // ── PASO 3: Bucle de refinamiento si score < 8 ──────────────────────────
@@ -46,45 +49,39 @@ export async function POST(req: NextRequest) {
       );
 
       try {
-        const response = await fetch('https://api.insforge.com/v1/ai/complete', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${INSFORGE_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: 'anthropic/claude-sonnet-4.5',
-            messages: [{ role: 'user', content: promptRefinamiento }],
-            max_tokens: 4000,
-            temperature: 0.8,
-          }),
+        const { object } = await generateObject({
+          model: google('gemini-2.5-flash'),
+          prompt: promptRefinamiento,
+          schema: z.object({
+            bloques_refinados: z.array(z.object({
+              id: z.string(),
+              tipo: z.string().optional(),
+              titulo: z.string(),
+              texto: z.string(),
+              logica_conversion: z.string().optional(),
+              angulo_usado: z.string().optional(),
+              dolor_atacado: z.string().optional(),
+              justificacion_educativa: z.string().optional(),
+            }))
+          })
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          const contenido = data.choices?.[0]?.message?.content || data.content || '';
-          const jsonMatch = contenido.match(/\{[\s\S]*\}/);
+        const refinados = object.bloques_refinados || [];
 
-          if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0]);
-            const refinados = parsed.bloques_refinados || parsed.bloquesRefinados || [];
-
-            // Reemplazar bloques refinados en el array original
-            for (const refinado of refinados) {
-              const idx = bloques.findIndex(b => b.id === refinado.id);
-              if (idx !== -1) {
-                bloques[idx] = {
-                  id: refinado.id,
-                  tipo: refinado.tipo || bloques[idx].tipo,
-                  titulo: refinado.titulo,
-                  texto: refinado.texto,
-                  logicaConversion: refinado.logica_conversion || refinado.logicaConversion || '',
-                  anguloUsado: refinado.angulo_usado || refinado.anguloUsado || '',
-                  dolorAtacado: refinado.dolor_atacado || refinado.dolorAtacado || '',
-                  justificacionEducativa: refinado.justificacion_educativa || refinado.justificacionEducativa || '',
-                };
-              }
-            }
+        // Reemplazar bloques refinados en el array original
+        for (const refinado of refinados) {
+          const idx = bloques.findIndex(b => b.id === refinado.id);
+          if (idx !== -1) {
+            bloques[idx] = {
+              id: refinado.id,
+              tipo: (refinado.tipo || bloques[idx].tipo) as BloqueVSL['tipo'],
+              titulo: refinado.titulo,
+              texto: refinado.texto,
+              logicaConversion: refinado.logica_conversion || '',
+              anguloUsado: refinado.angulo_usado || '',
+              dolorAtacado: refinado.dolor_atacado || '',
+              justificacionEducativa: refinado.justificacion_educativa || '',
+            };
           }
         }
       } catch (error) {
@@ -95,7 +92,7 @@ export async function POST(req: NextRequest) {
       iteraciones++;
 
       // Re-auditar después del refinamiento
-      auditoria = await auditarVSL(bloques, datosCliente, INSFORGE_API_KEY);
+      auditoria = await auditarVSL(bloques, datosCliente, GOOGLE_API_KEY);
       auditoria.iteracionesRefinamiento = iteraciones;
     }
 
@@ -122,10 +119,10 @@ export async function POST(req: NextRequest) {
     // ── Respuesta final ─────────────────────────────────────────────────────
     return NextResponse.json({
       exito: true,
-      fuente: esDemo ? 'modo_demo' : 'insforge_ai',
+      fuente: esDemo ? 'modo_demo' : 'gemini_ai',
       bloques,
       auditoria,
-      nota: esDemo ? 'Configurá INSFORGE_API_KEY para generación real con IA' : undefined,
+      nota: esDemo ? 'Configurá GOOGLE_GENERATIVE_AI_API_KEY en .env.local para generación real con IA' : undefined,
     });
 
   } catch (error) {
@@ -139,50 +136,43 @@ export async function POST(req: NextRequest) {
 
 // ─── Generar con Insforge AI ────────────────────────────────────────────────────
 async function generarConIA(
-  datosCliente: DatosCliente,
-  apiKey: string
+  datosCliente: DatosCliente
 ): Promise<BloqueVSL[]> {
   const prompt = buildVslPrompt(datosCliente);
 
-  const response = await fetch('https://api.insforge.com/v1/ai/complete', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'anthropic/claude-sonnet-4.5',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 6000,
-      temperature: 0.85,
-    }),
-  });
+  try {
+    const { object } = await generateObject({
+      model: google('gemini-2.5-flash'),
+      prompt,
+      schema: z.object({
+        mecanismo_unico: z.string().optional(),
+        bloques: z.array(z.object({
+          id: z.string(),
+          tipo: z.string(),
+          titulo: z.string(),
+          texto: z.string(),
+          logica_conversion: z.string().optional(),
+          angulo_usado: z.string().optional(),
+          dolor_atacado: z.string().optional(),
+          justificacion_educativa: z.string().optional(),
+        }))
+      })
+    });
 
-  if (!response.ok) {
-    console.error('[API/vsl] Insforge error, usando demo');
+    return (object.bloques || []).map(b => ({
+      id: b.id,
+      tipo: b.tipo as BloqueVSL['tipo'],
+      titulo: b.titulo,
+      texto: b.texto,
+      logicaConversion: b.logica_conversion || '',
+      anguloUsado: b.angulo_usado || '',
+      dolorAtacado: b.dolor_atacado || '',
+      justificacionEducativa: b.justificacion_educativa || '',
+    }));
+  } catch (error) {
+    console.error('[API/vsl] Gemini error, usando demo', error);
     return generarGuionDemo(datosCliente);
   }
-
-  const data = await response.json();
-  const contenido = data.choices?.[0]?.message?.content || data.content || '';
-  const jsonMatch = contenido.match(/\{[\s\S]*\}/);
-
-  if (!jsonMatch) {
-    throw new Error('No se encontró JSON en la respuesta de IA');
-  }
-
-  const parsed = JSON.parse(jsonMatch[0]);
-
-  return (parsed.bloques || []).map((b: Record<string, string>) => ({
-    id: b.id,
-    tipo: b.tipo,
-    titulo: b.titulo,
-    texto: b.texto,
-    logicaConversion: b.logica_conversion || b.logicaConversion || '',
-    anguloUsado: b.angulo_usado || b.anguloUsado || '',
-    dolorAtacado: b.dolor_atacado || b.dolorAtacado || '',
-    justificacionEducativa: b.justificacion_educativa || b.justificacionEducativa || '',
-  }));
 }
 
 // ─── Guion de demostración con Motor Emocional + Proof-Promise-Plan + RMBC ──────

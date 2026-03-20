@@ -3,7 +3,7 @@
 import type { DatosCliente, HallazgoResearch, BloqueVSL } from '@/lib/utils';
 
 // ─── SYSTEM PROMPT: Rol de élite del copywriter ─────────────────────────────────
-export const SYSTEM_PROMPT_VSL = `Eres un Copywriter de Respuesta Directa de élite, con más de 15 años de experiencia generando VSLs (Video Sales Letters) que han convertido millones de dólares en ventas para negocios locales.
+export const getSystemPromptVsl = (tono?: string) => `Eres un Copywriter de Respuesta Directa de élite, con más de 15 años de experiencia generando VSLs (Video Sales Letters) que han convertido millones de dólares en ventas para negocios locales.
 
 Tu especialidad es el marco persuasivo "Proof-Promise-Plan" de Alex Hormozi, el método de investigación RMBC de Stefan Georgi, y un Motor Emocional propio diseñado para tocar fibras sensibles sin manipular.
 
@@ -62,7 +62,7 @@ Después de redactar cada bloque del guion, DEBÉS incluir obligatoriamente:
 ## REGLAS DE ESTILO
 
 - Idioma: Español rioplatense/latino (Uruguay/Argentina). Usá "vos" y "tenés".
-- Tono: Directo, visceral, conversacional. Como si hablaras de frente.
+- Tono: ${tono || 'Directo, visceral, conversacional. Como si hablaras de frente.'}
 - Extensión bloques: 120-300 palabras por bloque.
 - Sin clichés genéricos de marketing ("líder del mercado", "soluciones integrales", etc.)
 - Sé ESPECÍFICO. Mencioná la zona geográfica, el tipo de negocio, los dolores reales.
@@ -78,7 +78,7 @@ export function buildHooksPrompt(
     ? `- ${datosCliente.quejasComunes}`
     : '- No hay quejas específicas documentadas (usá dolores genéricos del nicho)';
 
-  return `${SYSTEM_PROMPT_VSL}
+  return `${getSystemPromptVsl(datosCliente.tonoComunicacion)}
 
 ---
 
@@ -144,7 +144,7 @@ export function buildVslPrompt(
   const contextResearch = `- Quejas comunes del sector: ${datosCliente.quejasComunes || 'No especificadas'}
 - Lo que hace mal la competencia: ${datosCliente.competidoresInfo || 'No especificado'}`;
 
-  return `${SYSTEM_PROMPT_VSL}
+  return `${getSystemPromptVsl(datosCliente.tonoComunicacion)}
 
 ---
 
@@ -205,7 +205,7 @@ export function buildRegeneratePrompt(
   const contextResearch = `- Quejas comunes del sector: ${datosCliente.quejasComunes || 'No especificadas'}
 - Lo que hace mal la competencia: ${datosCliente.competidoresInfo || 'No especificado'}`;
 
-  return `${SYSTEM_PROMPT_VSL}
+  return `${getSystemPromptVsl(datosCliente.tonoComunicacion)}
 
 ---
 

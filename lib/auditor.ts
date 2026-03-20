@@ -1,7 +1,7 @@
 // lib/auditor.ts — Motor de Auditoría Interna del Sistema Ouroboros
 // Evalúa claridad, retención y congruencia de cada VSL generado
 import type { BloqueVSL, DatosCliente, ResultadoAuditoria } from '@/lib/utils';
-import { SYSTEM_PROMPT_VSL } from '@/lib/prompts';
+import { getSystemPromptVsl } from '@/lib/prompts';
 
 // ─── Prompt del Auditor de Calidad ──────────────────────────────────────────────
 const PROMPT_AUDITOR = `Eres un Auditor de Calidad Senior especializado en copywriting de VSLs (Video Sales Letters).
@@ -92,7 +92,7 @@ Texto actual: ${b.texto}
     })
     .join('\n\n');
 
-  return `${SYSTEM_PROMPT_VSL}
+  return `${getSystemPromptVsl(datosCliente?.tonoComunicacion)}
 
 ---
 

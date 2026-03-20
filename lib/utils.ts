@@ -16,6 +16,8 @@ export interface DatosCliente {
   quejasComunes: string;
   propuestaUnica: string;
   pruebaSocial?: string;
+  tonoComunicacion?: string;
+  queueId?: string;
 }
 
 export interface HallazgoResearch {

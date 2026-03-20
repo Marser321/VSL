@@ -1,6 +1,6 @@
 'use client';
 // app/page.tsx — Página principal del VSL Generator Pro
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,11 @@ import { ScriptBlock } from '@/components/ScriptBlock';
 import { HookVariants } from '@/components/HookVariants';
 import { AuditBadge } from '@/components/AuditBadge';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { TeleprompterModal } from '@/components/TeleprompterModal';
 import {
   Sparkles, Settings, FileText, Wand2,
-  Download, Copy, PlayCircle, Loader2, ChevronRight
+  Download, Copy, PlayCircle, Loader2, ChevronRight,
+  ListTodo, Send, MonitorPlay
 } from 'lucide-react';
 import type { DatosCliente, BloqueVSL, ResultadoAuditoria } from '@/lib/utils';
 
@@ -29,12 +31,43 @@ const DATOS_INICIALES: DatosCliente = {
   pruebaSocial: '',
 };
 
-type EtapaApp = 'configuracion' | 'editor';
+type EtapaApp = 'cola' | 'configuracion' | 'editor';
 
 // ─── Componente principal ──────────────────────────────────────────────────────
 export default function VslGeneratorPage() {
-  const [pestanaActiva, setPestanaActiva] = useState<EtapaApp>('configuracion');
+  const [pestanaActiva, setPestanaActiva] = useState<EtapaApp>('cola');
   const [datosCliente, setDatosCliente] = useState<DatosCliente>(DATOS_INICIALES);
+  const [queue, setQueue] = useState<any[]>([]);
+  const [isLoadingQueue, setIsLoadingQueue] = useState(false);
+  const [showTeleprompter, setShowTeleprompter] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const cargarCola = useCallback(async () => {
+    setIsLoadingQueue(true);
+    try {
+      const res = await fetch('/api/queue');
+      const data = await res.json();
+      if (data.queue) setQueue(data.queue);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingQueue(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (pestanaActiva === 'cola') cargarCola();
+  }, [pestanaActiva, cargarCola]);
+
+  const seleccionarClienteDesdeCola = (item: any) => {
+    setDatosCliente({
+      ...DATOS_INICIALES,
+      ...item.datos_cliente,
+      queueId: item.id
+    });
+    setPestanaActiva('configuracion');
+  };
+
   const [hooks, setHooks] = useState<{
     hookA: { texto: string; angulo: string; dolor_atacado?: string; por_que_funciona: string; justificacion_educativa?: string };
     hookB: { texto: string; angulo: string; dolor_atacado?: string; por_que_funciona: string; justificacion_educativa?: string };
@@ -178,8 +211,9 @@ export default function VslGeneratorPage() {
         <Tabs value={pestanaActiva} onValueChange={(v) => setPestanaActiva(v as EtapaApp)}>
           
           {/* Tab List */}
-          <TabsList className="grid w-full grid-cols-2 h-auto bg-card border border-border rounded-xl p-1 mb-6">
+          <TabsList className="grid w-full grid-cols-3 h-auto bg-card border border-border rounded-xl p-1 mb-6">
             {[
+              { value: 'cola', icon: ListTodo, label: 'Cola GHL', sub: queue.length ? `${queue.length} pendientes` : 'Al día' },
               { value: 'configuracion', icon: Settings, label: 'Configuración', sub: 'Datos del mercado' },
               { value: 'editor', icon: FileText, label: 'Editor VSL', sub: bloques.length ? `${bloques.length} bloques` : 'Guion final' },
             ].map(({ value, icon: Icono, label, sub }) => (
@@ -197,6 +231,56 @@ export default function VslGeneratorPage() {
             ))}
           </TabsList>
 
+          {/* ── TAB 0: Cola GHL ─────────────────────────────────────────────── */}
+          <TabsContent value="cola">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+              <div className="rounded-2xl border border-border bg-gradient-to-br from-background to-card p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <ListTodo size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold mb-1">Cola de Espera VSL</h2>
+                    <p className="text-sm text-muted-foreground">Clientes importados desde GoHighLevel. Seleccioná uno para generarle su guion.</p>
+                  </div>
+                </div>
+              </div>
+
+              {isLoadingQueue ? (
+                <div className="flex justify-center p-10"><Loader2 className="animate-spin text-muted-foreground" /></div>
+              ) : queue.length === 0 ? (
+                <div className="text-center p-10 border border-border rounded-xl bg-card">
+                  <p className="text-muted-foreground">No hay clientes pendientes en la cola.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {queue.map((item, i) => (
+                    <motion.div 
+                      key={item.id} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => seleccionarClienteDesdeCola(item)} 
+                      className="p-4 bg-card border border-border rounded-xl cursor-pointer hover:border-primary/50 transition-all flex justify-between items-center group shadow-sm hover:shadow-md"
+                    >
+                      <div>
+                        <p className="font-bold text-foreground text-base flex items-center gap-2">
+                          {item.nombre} <span className="text-xs text-muted-foreground font-normal bg-muted px-2 py-0.5 rounded-full">{item.email}</span>
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Negocio: <span className="text-foreground/70 font-medium">{item.datos_cliente?.nombreNegocio || 'No definido'}</span>
+                        </p>
+                      </div>
+                      <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </TabsContent>
+
           {/* ── TAB 1: Configuración ─────────────────────────────────────────── */}
           <TabsContent value="configuracion">
             <motion.div
@@ -207,8 +291,8 @@ export default function VslGeneratorPage() {
               {/* Hero intro */}
               <div className="rounded-2xl border border-border bg-gradient-to-br from-background to-card p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4A90D9]/20 to-[#4A90D9]/5 border border-[#4A90D9]/20 flex items-center justify-center flex-shrink-0">
-                    <Wand2 size={20} className="text-[#4A90D9]" />
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Wand2 size={20} className="text-primary" />
                   </div>
                   <div>
                     <h1 className="text-xl font-bold text-foreground mb-1">
@@ -271,6 +355,20 @@ export default function VslGeneratorPage() {
                         placeholder="Ej: +200 clientes satisfechos, 4.9★ en Google, 10 años en el mercado"
                         className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50 min-h-[70px] resize-none"
                       />
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-foreground/60">Tono de Comunicación VSL</Label>
+                      <select
+                        value={datosCliente.tonoComunicacion || ''}
+                        onChange={e => setDatosCliente(d => ({ ...d, tonoComunicacion: e.target.value }))}
+                        className="w-full bg-input border-border text-foreground text-sm rounded-md p-2 focus:ring-[#4A90D9]/50 focus:border-[#4A90D9]/50 outline-none"
+                      >
+                        <option value="">Directo, visceral, conversacional</option>
+                        <option value="Empático, cercano, comprensivo y suave">Empático y cercano</option>
+                        <option value="Agresivo, urgente, retador y directo al grano">Agresivo y urgente</option>
+                        <option value="Educativo, técnico, paciente y analítico">Educativo y analítico</option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -383,19 +481,29 @@ export default function VslGeneratorPage() {
                   <Button
                     size="sm"
                     variant="outline"
+                    onClick={() => setShowTeleprompter(true)}
+                    className="border-foreground/[0.1] bg-input text-foreground/60 hover:text-foreground text-xs"
+                  >
+                    <MonitorPlay size={12} className="mr-1.5" />
+                    Teleprompter
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={exportarGuion}
+                    className="border-foreground/[0.1] bg-input text-foreground/60 hover:text-foreground text-xs"
+                  >
+                    <Download size={12} className="mr-1.5" />
+                    Exportar .md
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={copiarTodoElGuion}
                     className="border-foreground/[0.1] bg-input text-foreground/60 hover:text-foreground hover:border-foreground/[20] text-xs"
                   >
                     <Copy size={12} className="mr-1.5" />
                     Copiar todo
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={exportarGuion}
-                    className="bg-[#4A90D9]/20 hover:bg-[#4A90D9]/30 text-[#60A5FA] border border-[#4A90D9]/30 text-xs"
-                  >
-                    <Download size={12} className="mr-1.5" />
-                    Exportar .md
                   </Button>
                 </div>
               </div>
@@ -459,19 +567,48 @@ export default function VslGeneratorPage() {
                   </div>
 
                   {/* Footer del guion */}
-                  <div className="rounded-xl border border-border bg-card p-4 text-center">
+                  <div className="rounded-xl border border-border bg-card p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-foreground/25">
-                      Guion generado con VSL Generator Pro · {new Date().toLocaleDateString('es-UY', {
-                        day: '2-digit', month: 'long', year: 'numeric',
-                      })}
+                      Guion generado con VSL Generator Pro · {new Date().toLocaleDateString('es-UY')}
                     </p>
-                    <Button
-                      size="sm"
-                      onClick={generarGuionTotal}
-                    >
-                      <RefreshCwIcon size={11} className="mr-1.5" />
-                      Regenerar guion completo
-                    </Button>
+                    <div className="flex items-center gap-3">
+                      <Button size="sm" variant="outline" onClick={generarGuionTotal}>
+                        <RefreshCwIcon size={11} className="mr-1.5" />
+                        Regenerar
+                      </Button>
+                      <Button
+                        size="sm"
+                        disabled={isExporting}
+                        onClick={async () => {
+                          setIsExporting(true);
+                          try {
+                            const res = await fetch('/api/webhooks/ghl-outbound', {
+                              method: 'POST',
+                              headers: {'Content-Type': 'application/json'},
+                              body: JSON.stringify({
+                                queueId: datosCliente.queueId,
+                                contactId: queue.find(q => q.id === datosCliente.queueId)?.contact_id || 'manual',
+                                vslPayload: { bloques, hooks }
+                              })
+                            });
+                            if (res.ok) {
+                              setPestanaActiva('cola');
+                              cargarCola(); // Refrescar cola
+                            } else {
+                              console.error("Error exportando a GHL.");
+                            }
+                          } catch (e) {
+                            console.error(e);
+                          } finally {
+                            setIsExporting(false);
+                          }
+                        }}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 px-6 font-bold"
+                      >
+                        {isExporting ? <Loader2 size={14} className="animate-spin mr-2" /> : <Send size={14} className="mr-2" />}
+                        Aprobar y Enviar a GHL
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -480,6 +617,13 @@ export default function VslGeneratorPage() {
 
         </Tabs>
       </main>
+
+      <TeleprompterModal 
+        isOpen={showTeleprompter} 
+        onClose={() => setShowTeleprompter(false)} 
+        bloques={bloques} 
+        hookActual={hooks ? (hookSeleccionado === 'A' ? hooks.hookA : hookSeleccionado === 'B' ? hooks.hookB : hooks.hookC) : null}
+      />
     </div>
   );
 }

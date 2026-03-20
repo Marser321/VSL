@@ -4,6 +4,9 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import type { DatosCliente, HallazgoResearch, BloqueVSL } from '@/lib/utils';
 import { buildRegeneratePrompt } from '@/lib/prompts';
+import { generateObject } from 'ai';
+import { google } from '@ai-sdk/google';
+import { z } from 'zod';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,9 +15,9 @@ export async function POST(req: NextRequest) {
       datosCliente: DatosCliente;
     };
 
-    const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
+    const GOOGLE_API_KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
-    if (!INSFORGE_API_KEY || INSFORGE_API_KEY === 'your_insforge_api_key_here') {
+    if (!GOOGLE_API_KEY) {
       // Modo demo: devolver el mismo bloque con texto ligeramente modificado
       return NextResponse.json({
         exito: true,
@@ -23,62 +26,53 @@ export async function POST(req: NextRequest) {
           ...bloqueOriginal,
           texto: `[VERSIÓN ALTERNATIVA] ${bloqueOriginal.texto}`,
           anguloUsado: `Variante alternativa de: ${bloqueOriginal.anguloUsado}`,
-          justificacionEducativa: `Esta es una versión alternativa del bloque original. En modo de producción (con INSFORGE_API_KEY configurada), la IA generaría un enfoque completamente diferente usando otro ángulo psicológico para maximizar la conversión.`,
+          justificacionEducativa: `Esta es una versión alternativa del bloque original. En modo de producción (con GOOGLE_GENERATIVE_AI_API_KEY configurada), la IA generaría un enfoque completamente diferente usando otro ángulo psicológico para maximizar la conversión.`,
         },
-        nota: 'Configurá INSFORGE_API_KEY para regeneración real con IA',
+        nota: 'Configurá GOOGLE_GENERATIVE_AI_API_KEY para regeneración real con IA',
       });
     }
 
     const prompt = buildRegeneratePrompt(bloqueOriginal, datosCliente);
 
-    const response = await fetch('https://api.insforge.com/v1/ai/complete', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${INSFORGE_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4.5',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 2000,
-        temperature: 0.9,
-      }),
-    });
+    try {
+      const { object } = await generateObject({
+        model: google('gemini-2.5-flash'),
+        prompt,
+        schema: z.object({
+          id: z.string().optional(),
+          tipo: z.string().optional(),
+          titulo: z.string(),
+          texto: z.string(),
+          logica_conversion: z.string().optional(),
+          angulo_usado: z.string().optional(),
+          dolor_atacado: z.string().optional(),
+          justificacion_educativa: z.string().optional(),
+        })
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[API/regenerate] Insforge error:', errorText);
+      const bloqueRegenerado: BloqueVSL = {
+        id: object.id || bloqueOriginal.id,
+        tipo: (object.tipo || bloqueOriginal.tipo) as BloqueVSL['tipo'],
+        titulo: object.titulo,
+        texto: object.texto,
+        logicaConversion: object.logica_conversion || '',
+        anguloUsado: object.angulo_usado || '',
+        dolorAtacado: object.dolor_atacado || '',
+        justificacionEducativa: object.justificacion_educativa || '',
+      };
+
+      return NextResponse.json({
+        exito: true,
+        fuente: 'gemini_ai',
+        bloque: bloqueRegenerado,
+      });
+    } catch (aiError) {
+      console.error('[API/regenerate] AI error:', aiError);
       return NextResponse.json({
         exito: false,
-        error: 'Error con Insforge AI al regenerar el bloque',
+        error: 'Error con Gemini AI al regenerar el bloque',
       }, { status: 500 });
     }
-
-    const data = await response.json();
-    const contenido = data.choices?.[0]?.message?.content || data.content || '';
-
-    const jsonMatch = contenido.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('JSON no encontrado en respuesta');
-
-    const parsed = JSON.parse(jsonMatch[0]);
-
-    // Normalizar snake_case -> camelCase
-    const bloqueRegenerado: BloqueVSL = {
-      id: parsed.id || bloqueOriginal.id,
-      tipo: parsed.tipo || bloqueOriginal.tipo,
-      titulo: parsed.titulo,
-      texto: parsed.texto,
-      logicaConversion: parsed.logica_conversion || parsed.logicaConversion || '',
-      anguloUsado: parsed.angulo_usado || parsed.anguloUsado || '',
-      dolorAtacado: parsed.dolor_atacado || parsed.dolorAtacado || '',
-      justificacionEducativa: parsed.justificacion_educativa || parsed.justificacionEducativa || '',
-    };
-
-    return NextResponse.json({
-      exito: true,
-      fuente: 'insforge_ai',
-      bloque: bloqueRegenerado,
-    });
 
   } catch (error) {
     console.error('[API/regenerate] Error general:', error);

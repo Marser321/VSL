@@ -4,6 +4,9 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import type { DatosCliente } from '@/lib/utils';
 import { buildHooksPrompt } from '@/lib/prompts';
+import { generateObject } from 'ai';
+import { google } from '@ai-sdk/google';
+import { z } from 'zod';
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,56 +14,53 @@ export async function POST(req: NextRequest) {
       datosCliente: DatosCliente;
     };
 
-    const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
+    const GOOGLE_API_KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
-    if (!INSFORGE_API_KEY || INSFORGE_API_KEY === 'your_insforge_api_key_here') {
+    if (!GOOGLE_API_KEY) {
       return NextResponse.json({
         exito: true,
         fuente: 'modo_demo',
         hooks: generarHooksDemo(datosCliente),
-        nota: 'Configurá INSFORGE_API_KEY para hooks generados por IA real',
+        nota: 'Configurá GOOGLE_GENERATIVE_AI_API_KEY en .env.local para hooks generados por IA real',
       });
     }
 
     // Construir prompt maestro para hooks
     const prompt = buildHooksPrompt(datosCliente);
 
-    const response = await fetch('https://api.insforge.com/v1/ai/complete', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${INSFORGE_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4.5',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 2000,
-        temperature: 0.9,
-      }),
-    });
+    try {
+      const HookSchema = z.object({
+        texto: z.string(),
+        angulo: z.string(),
+        dolor_atacado: z.string(),
+        por_que_funciona: z.string(),
+        justificacion_educativa: z.string()
+      });
 
-    if (!response.ok) {
+      const { object } = await generateObject({
+        model: google('gemini-2.5-flash'),
+        prompt,
+        schema: z.object({
+          hookA: HookSchema,
+          hookB: HookSchema,
+          hookC: HookSchema
+        })
+      });
+
+      return NextResponse.json({
+        exito: true,
+        fuente: 'gemini_ai',
+        hooks: object,
+      });
+    } catch (aiError) {
+      console.error('[API/hooks] AI Error:', aiError);
       return NextResponse.json({
         exito: true,
         fuente: 'modo_demo',
         hooks: generarHooksDemo(datosCliente),
-        nota: 'Error con Insforge AI. Usando hooks de demostración.',
+        nota: 'Error con Gemini AI. Usando hooks de demostración.',
       });
     }
-
-    const data = await response.json();
-    const contenido = data.choices?.[0]?.message?.content || data.content || '';
-    const jsonMatch = contenido.match(/\{[\s\S]*\}/);
-
-    if (!jsonMatch) throw new Error('JSON no encontrado en respuesta');
-
-    const parsed = JSON.parse(jsonMatch[0]);
-
-    return NextResponse.json({
-      exito: true,
-      fuente: 'insforge_ai',
-      hooks: parsed,
-    });
 
   } catch (error) {
     console.error('[API/hooks] Error:', error);
