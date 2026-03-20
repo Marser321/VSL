@@ -1,15 +1,15 @@
 // app/api/generate/regenerate/route.ts
 // Regenera un bloque individual del VSL con un ángulo diferente
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import type { DatosCliente, HallazgoResearch, BloqueVSL } from '@/lib/utils';
 import { buildRegeneratePrompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
-    const { bloqueOriginal, datosCliente, researchData } = await req.json() as {
+    const { bloqueOriginal, datosCliente } = await req.json() as {
       bloqueOriginal: BloqueVSL;
       datosCliente: DatosCliente;
-      researchData: HallazgoResearch[];
     };
 
     const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const prompt = buildRegeneratePrompt(bloqueOriginal, datosCliente, researchData);
+    const prompt = buildRegeneratePrompt(bloqueOriginal, datosCliente);
 
     const response = await fetch('https://api.insforge.com/v1/ai/complete', {
       method: 'POST',

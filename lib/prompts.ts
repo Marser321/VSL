@@ -72,11 +72,10 @@ Después de redactar cada bloque del guion, DEBÉS incluir obligatoriamente:
 
 // ─── Constructor del prompt para Hooks A/B/C ─────────────────────────────────────
 export function buildHooksPrompt(
-  datosCliente: DatosCliente,
-  quejasPrincipales: string[]
+  datosCliente: DatosCliente
 ): string {
-  const quejas = quejasPrincipales.length > 0
-    ? quejasPrincipales.map(q => `- ${q}`).join('\n')
+  const quejas = datosCliente.quejasComunes
+    ? `- ${datosCliente.quejasComunes}`
     : '- No hay quejas específicas documentadas (usá dolores genéricos del nicho)';
 
   return `${SYSTEM_PROMPT_VSL}
@@ -119,7 +118,7 @@ Mostrá el contraste brutal entre lo que el prospecto MERECE y lo que REALMENTE 
     "angulo": "Gancho Directo",
     "dolor_atacado": "El dolor específico que ataca...",
     "por_que_funciona": "Explicación técnica de la psicología de persuasión...",
-    "justificacion_educativa": "Explicación sencilla para el cliente de por qué esto genera conversiones..."
+    "justificacion_educativa": "Explicación sencilla para el cliente: por qué esta frase funciona, qué dolor ataca y por qué generará conversiones..."
   },
   "hookB": {
     "texto": "...",
@@ -140,18 +139,10 @@ Mostrá el contraste brutal entre lo que el prospecto MERECE y lo que REALMENTE 
 
 // ─── Constructor del prompt para el VSL completo ─────────────────────────────────
 export function buildVslPrompt(
-  datosCliente: DatosCliente,
-  researchData: HallazgoResearch[]
+  datosCliente: DatosCliente
 ): string {
-  const contextResearch = researchData.length > 0
-    ? researchData.map(h =>
-        `FUENTE: ${h.fuente.toUpperCase()}\n${h.titulo}\n${h.contenido}${
-          h.debilidades?.length ? `\nDebilidades detectadas: ${h.debilidades.join(', ')}` : ''
-        }${
-          h.doloresPrincipales?.length ? `\nDolores principales: ${h.doloresPrincipales.join(', ')}` : ''
-        }`
-      ).join('\n\n---\n\n')
-    : 'No se realizó investigación de competidores. Usá dolores genéricos del nicho según tu experiencia.';
+  const contextResearch = `- Quejas comunes del sector: ${datosCliente.quejasComunes || 'No especificadas'}
+- Lo que hace mal la competencia: ${datosCliente.competidoresInfo || 'No especificado'}`;
 
   return `${SYSTEM_PROMPT_VSL}
 
@@ -209,12 +200,10 @@ ${contextResearch}
 // ─── Constructor del prompt para regenerar un bloque individual ──────────────────
 export function buildRegeneratePrompt(
   bloqueOriginal: BloqueVSL,
-  datosCliente: DatosCliente,
-  researchData: HallazgoResearch[]
+  datosCliente: DatosCliente
 ): string {
-  const contextResearch = researchData
-    .map(h => `${h.fuente}: ${h.contenido.substring(0, 500)}`)
-    .join('\n');
+  const contextResearch = `- Quejas comunes del sector: ${datosCliente.quejasComunes || 'No especificadas'}
+- Lo que hace mal la competencia: ${datosCliente.competidoresInfo || 'No especificado'}`;
 
   return `${SYSTEM_PROMPT_VSL}
 

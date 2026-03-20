@@ -12,7 +12,8 @@ export interface DatosCliente {
   avatarObjetivo: string;
   problemasPrincipal: string;
   zonaGeografica: string;
-  urlsCompetidores: string[];
+  competidoresInfo: string;
+  quejasComunes: string;
   propuestaUnica: string;
   pruebaSocial?: string;
 }
@@ -49,9 +50,8 @@ export interface GuionVSL {
 export interface ProyectoVSL {
   id?: string;
   datosCliente: DatosCliente;
-  researchData: HallazgoResearch[];
   guion?: GuionVSL;
-  etapaActual: 'configuracion' | 'investigacion' | 'editor';
+  etapaActual: 'configuracion' | 'editor';
 }
 
 // Resultado de la auditoría interna Ouroboros

@@ -1,5 +1,6 @@
 // app/api/generate/audit/route.ts
 // Endpoint de auditoría interna — evalúa la calidad de un VSL generado
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import type { DatosCliente, BloqueVSL } from '@/lib/utils';
 import { auditarVSL } from '@/lib/auditor';

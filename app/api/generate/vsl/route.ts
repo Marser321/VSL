@@ -1,6 +1,7 @@
 // app/api/generate/vsl/route.ts
 // Genera el guion VSL completo con Bucle Ouroboros:
 // Generación → Auditoría → Refinamiento (si score < 8) → Registro en Memoria
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import type { DatosCliente, HallazgoResearch, BloqueVSL, ResultadoAuditoria } from '@/lib/utils';
 import { buildVslPrompt } from '@/lib/prompts';
@@ -11,9 +12,8 @@ const MAX_ITERACIONES_REFINAMIENTO = 2;
 
 export async function POST(req: NextRequest) {
   try {
-    const { datosCliente, researchData } = await req.json() as {
+    const { datosCliente } = await req.json() as {
       datosCliente: DatosCliente;
-      researchData: HallazgoResearch[];
     };
 
     const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     if (esDemo) {
       bloques = generarGuionDemo(datosCliente);
     } else {
-      bloques = await generarConIA(datosCliente, researchData, INSFORGE_API_KEY);
+      bloques = await generarConIA(datosCliente, INSFORGE_API_KEY);
     }
 
     // ── PASO 2: Auditoría interna (Sistema Ouroboros) ───────────────────────
@@ -140,10 +140,9 @@ export async function POST(req: NextRequest) {
 // ─── Generar con Insforge AI ────────────────────────────────────────────────────
 async function generarConIA(
   datosCliente: DatosCliente,
-  researchData: HallazgoResearch[],
   apiKey: string
 ): Promise<BloqueVSL[]> {
-  const prompt = buildVslPrompt(datosCliente, researchData);
+  const prompt = buildVslPrompt(datosCliente);
 
   const response = await fetch('https://api.insforge.com/v1/ai/complete', {
     method: 'POST',

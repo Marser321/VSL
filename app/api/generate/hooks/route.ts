@@ -1,14 +1,14 @@
 // app/api/generate/hooks/route.ts
 // Genera 3 variantes de Hook A/B/C: Gancho Directo, Gancho de Historia, Gancho de Contraste de Dolor
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import type { DatosCliente } from '@/lib/utils';
 import { buildHooksPrompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
-    const { datosCliente, quejasPrincipales } = await req.json() as {
+    const { datosCliente } = await req.json() as {
       datosCliente: DatosCliente;
-      quejasPrincipales?: string[];
     };
 
     const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Construir prompt maestro para hooks
-    const prompt = buildHooksPrompt(datosCliente, quejasPrincipales || []);
+    const prompt = buildHooksPrompt(datosCliente);
 
     const response = await fetch('https://api.insforge.com/v1/ai/complete', {
       method: 'POST',
