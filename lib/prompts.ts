@@ -61,8 +61,8 @@ Después de redactar cada bloque del guion, DEBÉS incluir obligatoriamente:
 
 ## REGLAS DE ESTILO
 
-- Idioma: Español rioplatense/latino (Uruguay/Argentina). Usá "vos" y "tenés".
-- Tono: ${tono || 'Directo, visceral, conversacional. Como si hablaras de frente.'}
+- Idioma: Español totalmente neutro e internacional (o Inglés si se deduce del contexto/ubicación). Evitá modismos rioplatenses, "vos" o slang local. Sé profesional pero persuasivo.
+- Tono: ${tono || 'Directo, visceral, conversacional. Como si hablaras de frente, pero en un formato internacional.'}
 - Extensión bloques: 120-300 palabras por bloque.
 - Sin clichés genéricos de marketing ("líder del mercado", "soluciones integrales", etc.)
 - Sé ESPECÍFICO. Mencioná la zona geográfica, el tipo de negocio, los dolores reales.
@@ -191,7 +191,7 @@ ${contextResearch}
       "id": "bloque_1",
       "tipo": "problema",
       "titulo": "Título del bloque (máximo 5 palabras)",
-      "texto": "Texto del guion (120-300 palabras, directo, conversacional, en español rioplatense)",
+      "texto": "Texto del guion (120-300 palabras, directo, conversacional, en idioma o español neutro)",
       "logica_conversion": "Explicación técnica: qué sesgo cognitivo aprovecha, qué principio de neuromarketing aplica, qué debilidad del competidor ataca",
       "angulo_usado": "Nombre del ángulo estratégico usado",
       "dolor_atacado": "El dolor específico del avatar que este bloque explota",

@@ -13,11 +13,14 @@ export async function POST(req: NextRequest) {
     // Mapeamos los Custom Fields al formato que espera VSL Editor
     // Ajustá las keys (payload.xxx) de acuerdo a cómo las mande tu Workflow en GHL
     const datosCliente = {
-      nombreNegocio: payload.customData?.nombre_negocio || payload.nombre_negocio || 'Negocio Desconocido',
+      nombreNegocio: payload.customData?.nombre_negocio || payload.nombre_negocio || payload.companyName || 'Negocio Desconocido',
       avatarObjetivo: payload.customData?.avatar_objetivo || payload.avatar_objetivo || 'Público general',
       problemasPrincipal: payload.customData?.problema_principal || payload.problema_principal || 'Problemas operativos',
-      zonaGeografica: payload.customData?.zona_geografica || payload.zona_geografica || 'Local',
+      zonaGeografica: payload.customData?.zona_geografica || payload.zona_geografica || payload.city || 'Local',
       propuestaUnica: payload.customData?.propuesta_unica || payload.propuesta_unica || '',
+      granPromesa: payload.customData?.gran_promesa || payload.gran_promesa || '',
+      garantia: payload.customData?.garantia || payload.garantia || '',
+      tonoComunicacion: payload.customData?.tono_comunicacion || payload.tono_comunicacion || '',
       quejasComunes: payload.customData?.quejas_comunes || payload.quejas_comunes || '',
       competidoresInfo: payload.customData?.competidores_info || payload.competidores_info || '',
       pruebaSocial: payload.customData?.prueba_social || payload.prueba_social || ''

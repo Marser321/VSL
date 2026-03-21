@@ -12,6 +12,7 @@ import { HookVariants } from '@/components/HookVariants';
 import { AuditBadge } from '@/components/AuditBadge';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { TeleprompterModal } from '@/components/TeleprompterModal';
+import { useSearchParams } from 'next/navigation';
 import {
   Sparkles, Settings, FileText, Wand2,
   Download, Copy, PlayCircle, Loader2, ChevronRight,
@@ -35,6 +36,9 @@ type EtapaApp = 'cola' | 'configuracion' | 'editor';
 
 // ─── Componente principal ──────────────────────────────────────────────────────
 export default function VslGeneratorPage() {
+  const searchParams = useSearchParams();
+  const incomingContactId = searchParams.get('contact_id');
+  
   const [pestanaActiva, setPestanaActiva] = useState<EtapaApp>('cola');
   const [datosCliente, setDatosCliente] = useState<DatosCliente>(DATOS_INICIALES);
   const [queue, setQueue] = useState<any[]>([]);
@@ -59,14 +63,24 @@ export default function VslGeneratorPage() {
     if (pestanaActiva === 'cola') cargarCola();
   }, [pestanaActiva, cargarCola]);
 
-  const seleccionarClienteDesdeCola = (item: any) => {
+  const seleccionarClienteDesdeCola = useCallback((item: any) => {
     setDatosCliente({
       ...DATOS_INICIALES,
       ...item.datos_cliente,
       queueId: item.id
     });
     setPestanaActiva('configuracion');
-  };
+  }, []);
+
+  // Efecto para Auto-Cargar datos si viene un contact_id por URL (incrustado en iframe GHL)
+  useEffect(() => {
+    if (incomingContactId && queue.length > 0) {
+      const foundClient = queue.find(q => q.contact_id === incomingContactId);
+      if (foundClient && pestanaActiva === 'cola') {
+        seleccionarClienteDesdeCola(foundClient);
+      }
+    }
+  }, [incomingContactId, queue, pestanaActiva, seleccionarClienteDesdeCola]);
 
   const [hooks, setHooks] = useState<{
     hookA: { texto: string; angulo: string; dolor_atacado?: string; por_que_funciona: string; justificacion_educativa?: string };
