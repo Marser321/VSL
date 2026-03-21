@@ -44,11 +44,7 @@ export function AuditBadge({ auditoria }: AuditBadgeProps) {
       <button
         onClick={() => setExpandido(!expandido)}
         className={`
-          flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-200 shadow-sm
-          ${aprobado
-            ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-500/20 hover:border-emerald-400 dark:hover:border-emerald-400/40'
-            : 'bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-500/20 hover:border-yellow-400 dark:hover:border-yellow-400/40'
-          }
+          flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/50 bg-muted/20 transition-all duration-200 shadow-sm hover:bg-muted/30 hover:border-border
         `}
       >
         <ShieldCheck size={13} className={aprobado ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-600 dark:text-yellow-400'} />

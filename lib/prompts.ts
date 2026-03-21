@@ -89,7 +89,9 @@ export function buildHooksPrompt(
 - Público objetivo: ${datosCliente.avatarObjetivo}
 - Problema que resuelve: ${datosCliente.problemasPrincipal}
 - Zona geográfica: ${datosCliente.zonaGeografica}
-- Propuesta única: ${datosCliente.propuestaUnica || 'No especificada'}
+- Mecanismo Único de Solución: ${datosCliente.propuestaUnica || 'No especificado'}
+- La Gran Promesa: ${datosCliente.granPromesa || 'No especificada'}
+- Garantía Ofrecida: ${datosCliente.garantia || 'No especificada'}
 
 ### QUEJAS DE COMPETIDORES DETECTADAS:
 ${quejas}
@@ -155,7 +157,9 @@ export function buildVslPrompt(
 - Público objetivo: ${datosCliente.avatarObjetivo}
 - Problema que resuelve: ${datosCliente.problemasPrincipal}
 - Zona geográfica: ${datosCliente.zonaGeografica}
-- Propuesta única de valor: ${datosCliente.propuestaUnica || 'No especificada — definí una basándote en los datos de la competencia'}
+- Mecanismo Único de Solución: ${datosCliente.propuestaUnica || 'No especificado — inferí uno basado en la competencia'}
+- La Gran Promesa: ${datosCliente.granPromesa || 'No especificada'}
+- Garantía Ofrecida: ${datosCliente.garantia || 'No especificada'}
 - Prueba social existente: ${datosCliente.pruebaSocial || 'No especificada'}
 
 ### INVESTIGACIÓN DE COMPETIDORES Y MERCADO:
@@ -222,7 +226,9 @@ export function buildRegeneratePrompt(
 - Público objetivo: ${datosCliente.avatarObjetivo}
 - Problema: ${datosCliente.problemasPrincipal}
 - Zona: ${datosCliente.zonaGeografica}
-- Propuesta única: ${datosCliente.propuestaUnica || 'No especificada'}
+- Mecanismo Único: ${datosCliente.propuestaUnica || 'No especificado'}
+- Promesa: ${datosCliente.granPromesa || 'No especificada'}
+- Garantía: ${datosCliente.garantia || 'No especificada'}
 
 ### CONTEXTO DE INVESTIGACIÓN:
 ${contextResearch || 'Sin datos de research disponibles.'}

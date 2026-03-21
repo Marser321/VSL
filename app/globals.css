@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -42,76 +42,78 @@
 }
 
 :root {
-  /* Tema Claro (Light Mode) */
-  --background: #FFFFFF;
-  --foreground: #080808;
-  --card: #F9FAFB;
-  --card-foreground: #080808;
+  /* Tema Claro (Light Mode) Premium Slate */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
   --popover: #FFFFFF;
-  --popover-foreground: #080808;
-  --primary: #4A90D9;
+  --popover-foreground: #0F172A;
+  --primary: #488EFF; /* Royal Blue */
   --primary-foreground: #FFFFFF;
-  --secondary: #F3F4F6;
-  --secondary-foreground: #1F2937;
-  --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
-  --accent: #EFF6FF;
-  --accent-foreground: #080808;
-  --destructive: #FF3333;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: rgba(0, 0, 0, 0.05);
-  --ring: #4A90D9;
-  --radius: 0.625rem;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #334155;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --accent: #F3FAFD; /* Brand Off-white */
+  --accent-foreground: #01327F; /* Dark Navy */
+  --destructive: #EF4444;
+  --border: rgba(1, 50, 127, 0.08); /* Navy at 8% */
+  --input: rgba(1, 50, 127, 0.05);
+  --ring: #488EFF;
+  --radius: 0.5rem;
 
   /* Paleta VSL (Light) */
-  --vsl-blue: #4A90D9;
-  --vsl-blue-light: #5BA8F5;
-  --vsl-blue-dim: rgba(74, 144, 217, 0.08);
-  --vsl-blue-glow: rgba(74, 144, 217, 0.15);
-  --vsl-black: #080808;
-  --vsl-dark: #FFFFFF; /* Fondos claros equivalentes */
+  --vsl-blue: #488EFF;
+  --vsl-blue-light: #81E7FF;
+  --vsl-blue-dim: rgba(72, 142, 255, 0.08);
+  --vsl-blue-glow: rgba(72, 142, 255, 0.15);
+  --vsl-black: #2E3033; /* Brand Dark Gray */
+  --vsl-dark: #FFFFFF;
   --vsl-card: #FFFFFF;
-  --vsl-card-hover: #F9FAFB;
-  --vsl-border: rgba(0, 0, 0, 0.08);
-  --vsl-border-red: rgba(74, 144, 217, 0.25);
+  --vsl-card-hover: #F3FAFD;
+  --vsl-border: rgba(1, 50, 127, 0.08);
+  --vsl-border-blue: rgba(72, 142, 255, 0.25);
+  --vsl-shadow-color: rgba(1, 50, 127, 0.06);
 }
 
 .dark {
-  /* Tema base - dark mode */
-  --background: #080808;
-  --foreground: #F0F0F0;
-  --card: #111111;
-  --card-foreground: #F0F0F0;
-  --popover: #111111;
-  --popover-foreground: #F0F0F0;
-  --primary: #4A90D9;
+  /* Tema base - dark mode premium */
+  --background: #020617; /* Mantenemos Slate 950 para profundiad */
+  --foreground: #FEFEFE;
+  --card: #0F172A;
+  --card-foreground: #FEFEFE;
+  --popover: #0F172A;
+  --popover-foreground: #FEFEFE;
+  --primary: #488EFF;
   --primary-foreground: #FFFFFF;
-  --secondary: #1A1A1A;
-  --secondary-foreground: #C8C8C8;
-  --muted: #1A1A1A;
-  --muted-foreground: #707070;
-  --accent: #0C1929;
-  --accent-foreground: #F0F0F0;
-  --destructive: #FF3333;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.06);
-  --ring: #4A90D9;
+  --secondary: #1E293B;
+  --secondary-foreground: #E2E8F0;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
+  --accent: #01327F;
+  --accent-foreground: #F8FAFC;
+  --destructive: #EF4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: #488EFF;
 
   /* Paleta VSL (Dark) */
-  --vsl-blue: #4A90D9;
-  --vsl-blue-light: #5BA8F5;
-  --vsl-blue-dim: rgba(74, 144, 217, 0.12);
-  --vsl-blue-glow: rgba(74, 144, 217, 0.25);
-  --vsl-black: #080808;
-  --vsl-dark: #0E0E0E;
-  --vsl-card: #131313;
-  --vsl-card-hover: #181818;
-  --vsl-border: rgba(255, 255, 255, 0.07);
-  --vsl-border-red: rgba(74, 144, 217, 0.35);
+  --vsl-blue: #488EFF;
+  --vsl-blue-light: #81E7FF;
+  --vsl-blue-dim: rgba(72, 142, 255, 0.12);
+  --vsl-blue-glow: rgba(72, 142, 255, 0.25);
+  --vsl-black: #020617;
+  --vsl-dark: #0F172A;
+  --vsl-card: #0F172A;
+  --vsl-card-hover: #1E293B;
+  --vsl-border: rgba(255, 255, 255, 0.06);
+  --vsl-border-blue: rgba(72, 142, 255, 0.35);
+  --vsl-shadow-color: rgba(0, 0, 0, 0.5);
 }
 
 html {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 html.dark {
   color-scheme: dark;
@@ -123,7 +125,7 @@ html.dark {
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
   }
 }
 
@@ -143,30 +145,35 @@ html.dark {
   background: var(--primary);
 }
 
-/* Glassmorphism card base */
+/* Glassmorphism premium base */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
+  border: 1px solid var(--vsl-border);
 }
 
-/* Glow rojo */
+.premium-border {
+  border: 1px solid var(--vsl-border);
+  box-shadow: 0 4px 30px var(--vsl-shadow-color);
+}
+
+/* Glow azul premium */
 .blue-glow {
-  box-shadow: 0 0 20px rgba(74, 144, 217, 0.15), 0 0 60px rgba(74, 144, 217, 0.05);
+  box-shadow: 0 0 20px var(--vsl-blue-dim), 0 0 60px var(--vsl-blue-dim);
 }
 
-/* Animación de pulso rojo */
+/* Animación de pulso azul */
 @keyframes pulse-blue {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 144, 217, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(74, 144, 217, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(14, 165, 233, 0); }
 }
 .animate-pulse-blue {
   animation: pulse-blue 2s ease-in-out infinite;
 }
 
-/* Gradiente de texto */
+/* Gradiente de texto celeste corporativo */
 .text-gradient-blue {
-  background: linear-gradient(135deg, #4A90D9 0%, #60A5FA 50%, #4A90D9 100%);
+  background: linear-gradient(135deg, #81E7FF 0%, #488EFF 50%, #01327F 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -174,9 +181,33 @@ html.dark {
 
 /* Borde animado */
 @keyframes border-glow {
-  0%, 100% { border-color: rgba(74, 144, 217, 0.3); }
-  50% { border-color: rgba(74, 144, 217, 0.7); }
+  0%, 100% { border-color: rgba(14, 165, 233, 0.2); }
+  50% { border-color: rgba(14, 165, 233, 0.6); }
 }
 .animate-border-glow {
   animation: border-glow 2s ease-in-out infinite;
+}
+
+/* Custom Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }

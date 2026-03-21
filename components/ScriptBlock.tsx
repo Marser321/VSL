@@ -8,6 +8,7 @@ import {
   CheckCheck, BookOpen, Crosshair
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { cn, type BloqueVSL, NOMBRE_BLOQUE, COLOR_BLOQUE } from '@/lib/utils';
 
 interface ScriptBlockProps {
@@ -63,7 +64,7 @@ export function ScriptBlock({ bloque, index, onActualizar, onRegenerarBloque, is
                 onClick={copiarTexto}
                 className="h-7 px-2 text-muted-foreground hover:text-foreground hover:bg-muted text-xs"
               >
-                {copiado ? <CheckCheck size={13} className="text-emerald-600 dark:text-emerald-400" /> : <Copy size={13} />}
+                {copiado ? <CheckCheck size={13} className="text-primary" /> : <Copy size={13} />}
                 <span className="ml-1">{copiado ? 'Copiado' : 'Copiar'}</span>
               </Button>
               <Button
@@ -80,13 +81,13 @@ export function ScriptBlock({ bloque, index, onActualizar, onRegenerarBloque, is
           </div>
           
           {/* Área editable del texto */}
-          <textarea
+          <Textarea
             value={texto}
             onChange={(e) => {
               setTexto(e.target.value);
               onActualizar(bloque.id, e.target.value);
             }}
-            className="w-full bg-transparent text-foreground text-[13px] leading-[1.75] p-5 resize-none focus:outline-none min-h-[150px] placeholder:text-muted-foreground/50"
+            className="w-full bg-transparent text-foreground text-[13px] leading-[1.75] p-5 resize-none border-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:outline-none min-h-[150px] placeholder:text-muted-foreground/50 shadow-none border-t-0 border-b-0 border-r-0 border-l-0"
             placeholder="Texto del guion..."
             rows={6}
           />
@@ -94,13 +95,13 @@ export function ScriptBlock({ bloque, index, onActualizar, onRegenerarBloque, is
           {/* Dolor atacado + Ángulo */}
           <div className="px-5 pb-4 space-y-2.5">
             {bloque.dolorAtacado && (
-              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30">
-                <Crosshair size={13} className="text-rose-600 dark:text-rose-400 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-900/30">
+                <Crosshair size={13} className="text-sky-600 dark:text-sky-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-[10px] text-rose-600 dark:text-rose-400 uppercase tracking-widest font-semibold block mb-1">
+                  <span className="text-[10px] text-sky-600 dark:text-sky-400 uppercase tracking-widest font-semibold block mb-1">
                     Dolor atacado
                   </span>
-                  <span className="text-xs text-rose-800 dark:text-rose-300/80 leading-relaxed">
+                  <span className="text-xs text-sky-800 dark:text-sky-300/80 leading-relaxed">
                     {bloque.dolorAtacado}
                   </span>
                 </div>
@@ -115,20 +116,20 @@ export function ScriptBlock({ bloque, index, onActualizar, onRegenerarBloque, is
         {/* Panel derecho: Lógica de Conversión + Justificación Educativa */}
         <div className="space-y-3">
           {/* Lógica de Conversión (técnica) */}
-          <div className="rounded-xl border overflow-hidden transition-all duration-300 bg-sky-50 dark:bg-sky-950/10 border-sky-200 dark:border-sky-800/30 shadow-sm">
+          <div className="rounded-xl border overflow-hidden transition-all duration-300 bg-muted/10 border-border shadow-sm">
             <button
               onClick={() => setLogicaVisible(!logicaVisible)}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-sky-100/60 dark:hover:bg-sky-900/10 transition-colors"
+              className="outline-none w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <Brain size={14} className="text-sky-600 dark:text-sky-400" />
-                <span className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider">
+                <Brain size={14} className="text-foreground/70" />
+                <span className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
                   Lógica de Conversión
                 </span>
               </div>
               {logicaVisible 
-                ? <ChevronUp size={13} className="text-sky-500/60" /> 
-                : <ChevronDown size={13} className="text-sky-500/60" />
+                ? <ChevronUp size={13} className="text-foreground/50" /> 
+                : <ChevronDown size={13} className="text-foreground/50" />
               }
             </button>
             
@@ -145,11 +146,11 @@ export function ScriptBlock({ bloque, index, onActualizar, onRegenerarBloque, is
                     <p className="text-[12px] text-foreground/70 leading-[1.7]">
                       {bloque.logicaConversion}
                     </p>
-                    <div className="mt-3 pt-3 border-t border-sky-200 dark:border-sky-800/30">
-                      <span className="text-[10px] text-sky-600/60 dark:text-sky-400/50 uppercase tracking-wider font-mono block mb-1">
+                    <div className="mt-3 pt-3 border-t border-border/50">
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono block mb-1">
                         SESGO / ÁNGULO PSICOLÓGICO
                       </span>
-                      <span className="text-xs font-semibold text-sky-700 dark:text-sky-300">
+                      <span className="text-xs font-semibold text-foreground/80">
                         {bloque.anguloUsado}
                       </span>
                     </div>
@@ -161,20 +162,20 @@ export function ScriptBlock({ bloque, index, onActualizar, onRegenerarBloque, is
 
           {/* Justificación Educativa (para el cliente) */}
           {bloque.justificacionEducativa && (
-            <div className="rounded-xl border overflow-hidden transition-all duration-300 bg-amber-50 dark:bg-amber-950/10 border-amber-200 dark:border-amber-800/30 shadow-sm">
+            <div className="rounded-xl border overflow-hidden transition-all duration-300 bg-muted/10 border-border shadow-sm">
               <button
                 onClick={() => setEducativoVisible(!educativoVisible)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-amber-100/60 dark:hover:bg-amber-900/10 transition-colors"
+                className="outline-none w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <BookOpen size={14} className="text-amber-600 dark:text-amber-400" />
-                  <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+                  <BookOpen size={14} className="text-foreground/70" />
+                  <span className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
                     Lógica y Justificación
                   </span>
                 </div>
                 {educativoVisible
-                  ? <ChevronUp size={13} className="text-amber-500/60" />
-                  : <ChevronDown size={13} className="text-amber-500/60" />
+                  ? <ChevronUp size={13} className="text-foreground/50" />
+                  : <ChevronDown size={13} className="text-foreground/50" />
                 }
               </button>
 
@@ -188,7 +189,7 @@ export function ScriptBlock({ bloque, index, onActualizar, onRegenerarBloque, is
                     className="overflow-hidden"
                   >
                     <div className="px-4 pb-4 pt-1">
-                      <p className="text-[11px] text-amber-700/60 dark:text-amber-300/50 leading-relaxed italic mb-2">
+                      <p className="text-[11px] text-muted-foreground leading-relaxed italic mb-2">
                         Explicación sencilla para el cliente:
                       </p>
                       <p className="text-[12px] text-foreground/65 leading-[1.7]">

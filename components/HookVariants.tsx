@@ -23,24 +23,24 @@ interface HookVariantsProps {
 
 const VARIANTE_STYLES = {
   A: {
-    badge: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-700/40',
-    border: 'border-sky-200 dark:border-sky-800/30',
-    borderSelected: 'border-sky-500 dark:border-sky-400 shadow-sky-200/50 dark:shadow-sky-900/30',
-    dot: 'bg-sky-500',
+    badge: 'bg-muted text-foreground/70 border-border',
+    border: 'border-border/50',
+    borderSelected: 'border-primary shadow-primary/20 premium-border',
+    dot: 'bg-primary',
     label: 'VARIANTE A',
   },
   B: {
-    badge: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700/40',
-    border: 'border-amber-200 dark:border-amber-800/30',
-    borderSelected: 'border-amber-500 dark:border-amber-400 shadow-amber-200/50 dark:shadow-amber-900/30',
-    dot: 'bg-amber-500',
+    badge: 'bg-muted text-foreground/70 border-border',
+    border: 'border-border/50',
+    borderSelected: 'border-primary shadow-primary/20 premium-border',
+    dot: 'bg-primary',
     label: 'VARIANTE B',
   },
   C: {
-    badge: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-700/40',
-    border: 'border-violet-200 dark:border-violet-800/30',
-    borderSelected: 'border-violet-500 dark:border-violet-400 shadow-violet-200/50 dark:shadow-violet-900/30',
-    dot: 'bg-violet-500',
+    badge: 'bg-muted text-foreground/70 border-border',
+    border: 'border-border/50',
+    borderSelected: 'border-primary shadow-primary/20 premium-border',
+    dot: 'bg-primary',
     label: 'VARIANTE C',
   },
 };
@@ -88,7 +88,7 @@ function HookCard({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400"
+            className="flex items-center gap-1 text-primary"
           >
             <Check size={12} strokeWidth={3} />
             <span className="text-[10px] font-bold">ACTIVO</span>
@@ -129,10 +129,10 @@ function HookCard({
       )}
 
       {/* Por qué funciona (técnico) */}
-      <div className="mx-3 mb-2 p-2.5 rounded-lg bg-sky-50 dark:bg-sky-950/10 border border-sky-200 dark:border-sky-800/25">
+      <div className="mx-3 mb-2 p-2.5 rounded-lg bg-muted/20 border border-border/50">
         <div className="flex items-center gap-1.5 mb-1">
-          <Zap size={10} className="text-sky-600 dark:text-sky-400" />
-          <span className="text-[9px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-widest">
+          <Zap size={10} className="text-foreground/70" />
+          <span className="text-[9px] font-bold text-foreground/70 uppercase tracking-widest">
             Por qué funciona
           </span>
         </div>
@@ -143,10 +143,10 @@ function HookCard({
 
       {/* Justificación Educativa */}
       {data.justificacion_educativa && (
-        <div className="mx-3 mb-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-800/25">
+        <div className="mx-3 mb-3 p-2.5 rounded-lg bg-muted/20 border border-border/50">
           <div className="flex items-center gap-1.5 mb-1">
-            <BookOpen size={10} className="text-amber-600 dark:text-amber-400" />
-            <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+            <BookOpen size={10} className="text-foreground/70" />
+            <span className="text-[9px] font-bold text-foreground/70 uppercase tracking-widest">
               Lógica y Justificación
             </span>
           </div>
@@ -164,7 +164,7 @@ function HookCard({
           className={cn(
             'w-full py-2.5 rounded-lg text-xs font-semibold transition-all duration-200',
             seleccionado
-              ? 'bg-emerald-100 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-600/40'
+              ? 'bg-primary/10 text-primary border border-primary/30'
               : 'bg-muted text-muted-foreground border border-border hover:bg-primary/10 hover:text-primary hover:border-primary/30'
           )}
         >

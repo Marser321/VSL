@@ -14,7 +14,9 @@ export interface DatosCliente {
   zonaGeografica: string;
   competidoresInfo: string;
   quejasComunes: string;
-  propuestaUnica: string;
+  propuestaUnica: string;  // Se usará como Mecanismo Único
+  granPromesa?: string;
+  garantia?: string;
   pruebaSocial?: string;
   tonoComunicacion?: string;
   queueId?: string;

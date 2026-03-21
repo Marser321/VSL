@@ -2,7 +2,7 @@
 // app/page.tsx — Página principal del VSL Generator Pro
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -190,13 +190,11 @@ export default function VslGeneratorPage() {
       <header className="border-b border-border bg-background/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#4A90D9] to-[#1E3A8A] flex items-center justify-center blue-glow">
-              <PlayCircle size={14} className="text-foreground" />
-            </div>
-            <div>
-              <span className="text-sm font-bold text-foreground">VSL Generator</span>
-              <span className="text-sm font-bold text-[#4A90D9]"> Pro</span>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="ad MediaSolution Logo" 
+              className="h-7 w-auto object-contain dark:drop-shadow-[0_0_15px_rgba(72,142,255,0.2)]" 
+            />
           </div>
           <div className="flex items-center gap-2 text-xs text-foreground/30 font-mono">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -208,31 +206,36 @@ export default function VslGeneratorPage() {
 
       {/* Main */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <Tabs value={pestanaActiva} onValueChange={(v) => setPestanaActiva(v as EtapaApp)}>
-          
-          {/* Tab List */}
-          <TabsList className="grid w-full grid-cols-3 h-auto bg-card border border-border rounded-xl p-1 mb-6">
+        <div className="flex justify-center mb-10 w-full mx-auto">
+          <div className="flex w-full items-center p-1.5 bg-card/60 border border-border/50 rounded-2xl backdrop-blur-xl shadow-xl">
             {[
-              { value: 'cola', icon: ListTodo, label: 'Cola GHL', sub: queue.length ? `${queue.length} pendientes` : 'Al día' },
-              { value: 'configuracion', icon: Settings, label: 'Configuración', sub: 'Datos del mercado' },
-              { value: 'editor', icon: FileText, label: 'Editor VSL', sub: bloques.length ? `${bloques.length} bloques` : 'Guion final' },
-            ].map(({ value, icon: Icono, label, sub }) => (
-              <TabsTrigger
-                key={value}
-                value={value}
-                className="flex flex-col items-center gap-0.5 py-2.5 px-3 rounded-lg text-muted-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-              >
-                <div className="flex items-center gap-1.5">
-                  <Icono size={13} />
-                  <span className="text-xs font-semibold">{label}</span>
-                </div>
-                <span className="text-[10px] text-foreground/25 hidden sm:block">{sub}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+              { value: 'cola', icon: ListTodo, label: 'Cola GHL' },
+              { value: 'configuracion', icon: Settings, label: 'Configuración' },
+              { value: 'editor', icon: FileText, label: 'Editor VSL' },
+            ].map(({ value, icon: Icono, label }) => {
+              const isActive = pestanaActiva === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => setPestanaActiva(value as EtapaApp)}
+                  className={`
+                    flex-1 flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-2.5 py-3 md:py-4 px-2 rounded-[14px] text-xs md:text-sm font-bold transition-all duration-300 outline-none
+                    ${isActive 
+                      ? 'text-foreground bg-muted/80 shadow-sm border border-border blue-glow' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent'
+                    }
+                  `}
+                >
+                  <Icono size={18} className={isActive ? 'text-primary' : 'text-current'} />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-          {/* ── TAB 0: Cola GHL ─────────────────────────────────────────────── */}
-          <TabsContent value="cola">
+        {/* ── TAB 0: Cola GHL ─────────────────────────────────────────────── */}
+        {pestanaActiva === 'cola' && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
               <div className="rounded-2xl border border-border bg-gradient-to-br from-background to-card p-6">
                 <div className="flex items-start gap-4">
@@ -279,10 +282,10 @@ export default function VslGeneratorPage() {
                 </div>
               )}
             </motion.div>
-          </TabsContent>
+        )}
 
-          {/* ── TAB 1: Configuración ─────────────────────────────────────────── */}
-          <TabsContent value="configuracion">
+        {/* ── TAB 1: Configuración ─────────────────────────────────────────── */}
+        {pestanaActiva === 'configuracion' && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -311,9 +314,9 @@ export default function VslGeneratorPage() {
                 
                 {/* Columna izquierda */}
                 <div className="space-y-4">
-                  <div className="glass-card rounded-xl p-5 space-y-4">
+                  <div className="glass-card rounded-xl p-5 space-y-4 premium-border">
                     <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                      <span className="w-1 h-3 bg-[#4A90D9] rounded-full" />
+                      <span className="w-1 h-3 bg-primary rounded-full" />
                       Datos del negocio
                     </h2>
 
@@ -323,7 +326,7 @@ export default function VslGeneratorPage() {
                         value={datosCliente.nombreNegocio}
                         onChange={e => setDatosCliente(d => ({ ...d, nombreNegocio: e.target.value }))}
                         placeholder="Ej: Taller Mecánico García"
-                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50 focus:ring-[#4A90D9]/20"
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-primary/20"
                       />
                     </div>
 
@@ -333,17 +336,27 @@ export default function VslGeneratorPage() {
                         value={datosCliente.zonaGeografica}
                         onChange={e => setDatosCliente(d => ({ ...d, zonaGeografica: e.target.value }))}
                         placeholder="Ej: Montevideo, Uruguay"
-                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50"
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="text-xs text-foreground/60">Propuesta única de valor</Label>
+                      <Label className="text-xs text-foreground/60">Mecanismo Único de Solución (Por qué tu método funciona) *</Label>
                       <Textarea
                         value={datosCliente.propuestaUnica}
                         onChange={e => setDatosCliente(d => ({ ...d, propuestaUnica: e.target.value }))}
-                        placeholder="¿Qué te hace diferente? Ej: Diagnóstico con video + precio fijo garantizado"
-                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50 min-h-[80px] resize-none"
+                        placeholder="Ej: Diagnóstico con IA + Video en tiempo real que garantiza precisión absoluta."
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 min-h-[80px] resize-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-foreground/60">La Gran Promesa (El resultado irresistible) *</Label>
+                      <Textarea
+                        value={datosCliente.granPromesa || ''}
+                        onChange={e => setDatosCliente(d => ({ ...d, granPromesa: e.target.value }))}
+                        placeholder="Ej: Arreglamos tu auto en 48hs o no pagás la mano de obra."
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 min-h-[70px] resize-none"
                       />
                     </div>
 
@@ -353,31 +366,52 @@ export default function VslGeneratorPage() {
                         value={datosCliente.pruebaSocial || ''}
                         onChange={e => setDatosCliente(d => ({ ...d, pruebaSocial: e.target.value }))}
                         placeholder="Ej: +200 clientes satisfechos, 4.9★ en Google, 10 años en el mercado"
-                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50 min-h-[70px] resize-none"
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 min-h-[70px] resize-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-foreground/60">Garantía / Inversión de Riesgo</Label>
+                      <Textarea
+                        value={datosCliente.garantia || ''}
+                        onChange={e => setDatosCliente(d => ({ ...d, garantia: e.target.value }))}
+                        placeholder="Ej: Garantía total por 12 meses. Si vuelve a fallar, te devolvemos el dinero."
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 min-h-[70px] resize-none"
                       />
                     </div>
                     
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       <Label className="text-xs text-foreground/60">Tono de Comunicación VSL</Label>
-                      <select
-                        value={datosCliente.tonoComunicacion || ''}
-                        onChange={e => setDatosCliente(d => ({ ...d, tonoComunicacion: e.target.value }))}
-                        className="w-full bg-input border-border text-foreground text-sm rounded-md p-2 focus:ring-[#4A90D9]/50 focus:border-[#4A90D9]/50 outline-none"
-                      >
-                        <option value="">Directo, visceral, conversacional</option>
-                        <option value="Empático, cercano, comprensivo y suave">Empático y cercano</option>
-                        <option value="Agresivo, urgente, retador y directo al grano">Agresivo y urgente</option>
-                        <option value="Educativo, técnico, paciente y analítico">Educativo y analítico</option>
-                      </select>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { val: '', label: 'Directo y casual' },
+                          { val: 'Empático, cercano, comprensivo y suave', label: 'Empático y cercano' },
+                          { val: 'Agresivo, urgente, retador y directo al grano', label: 'Agresivo y urgente' },
+                          { val: 'Educativo, técnico, paciente y analítico', label: 'Educativo y analítico' }
+                        ].map(tone => (
+                          <button
+                            key={tone.label}
+                            type="button"
+                            onClick={() => setDatosCliente(d => ({ ...d, tonoComunicacion: tone.val }))}
+                            className={`p-2 rounded-lg text-xs font-medium border transition-all text-center outline-none ${
+                              (datosCliente.tonoComunicacion || '') === tone.val
+                                ? 'bg-primary/10 border-primary/50 text-foreground blue-glow'
+                                : 'bg-input/50 border-border/50 text-muted-foreground hover:bg-input hover:text-foreground'
+                            }`}
+                          >
+                            {tone.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Columna derecha */}
                 <div className="space-y-4">
-                  <div className="glass-card rounded-xl p-5 space-y-4">
+                  <div className="glass-card rounded-xl p-5 space-y-4 premium-border">
                     <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                      <span className="w-1 h-3 bg-[#4A90D9] rounded-full" />
+                      <span className="w-1 h-3 bg-primary rounded-full" />
                       Avatar y problema
                     </h2>
 
@@ -387,7 +421,7 @@ export default function VslGeneratorPage() {
                         value={datosCliente.avatarObjetivo}
                         onChange={e => setDatosCliente(d => ({ ...d, avatarObjetivo: e.target.value }))}
                         placeholder="Ej: Dueños de autos de clase media, 30-55 años, poco tiempo libre, desconfían de los talleres"
-                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50 min-h-[90px] resize-none"
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 min-h-[90px] resize-none"
                       />
                     </div>
 
@@ -397,15 +431,15 @@ export default function VslGeneratorPage() {
                         value={datosCliente.problemasPrincipal}
                         onChange={e => setDatosCliente(d => ({ ...d, problemasPrincipal: e.target.value }))}
                         placeholder="Ej: Los talleres tradicionales cobran de más, no dan presupuestos claros y tardan semanas"
-                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50 min-h-[90px] resize-none"
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 min-h-[90px] resize-none"
                       />
                     </div>
                   </div>
 
                   {/* Información manual del mercado */}
-                  <div className="glass-card rounded-xl p-5 space-y-3">
+                  <div className="glass-card rounded-xl p-5 space-y-3 premium-border">
                     <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                       <span className="w-1 h-3 bg-[#4A90D9] rounded-full" />
+                       <span className="w-1 h-3 bg-primary rounded-full" />
                        Investigación de Mercado
                     </h2>
 
@@ -415,7 +449,7 @@ export default function VslGeneratorPage() {
                         value={datosCliente.competidoresInfo || ''}
                         onChange={e => setDatosCliente(d => ({ ...d, competidoresInfo: e.target.value }))}
                         placeholder="Ej: Tardan mucho, no dan presupuestos fijos, atienden mal..."
-                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50 min-h-[70px] resize-none text-sm"
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 min-h-[70px] resize-none text-sm"
                       />
                     </div>
 
@@ -425,7 +459,7 @@ export default function VslGeneratorPage() {
                         value={datosCliente.quejasComunes || ''}
                         onChange={e => setDatosCliente(d => ({ ...d, quejasComunes: e.target.value }))}
                         placeholder="Ej: La gente tiene miedo a que le cobren de más sin saber por qué..."
-                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-[#4A90D9]/50 min-h-[70px] resize-none text-sm"
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 min-h-[70px] resize-none text-sm"
                       />
                     </div>
                   </div>
@@ -437,7 +471,7 @@ export default function VslGeneratorPage() {
                 <Button
                   onClick={generarGuionTotal}
                   disabled={!camposCompletos || isGenerandoVSL}
-                  className="w-full sm:w-auto bg-[#4A90D9] hover:bg-[#5BA8F5] text-foreground font-bold px-8 py-3 h-auto rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed blue-glow transition-all duration-200"
+                  className="w-full sm:w-auto bg-primary hover:bg-[#38BDF8] text-foreground font-bold px-8 py-3 h-auto rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed blue-glow transition-all duration-200"
                 >
                   {isGenerandoVSL ? (
                     <>
@@ -457,10 +491,10 @@ export default function VslGeneratorPage() {
                 )}
               </div>
             </motion.div>
-          </TabsContent>
+        )}
 
-          {/* ── TAB 3: Editor VSL ────────────────────────────────────────────── */}
-          <TabsContent value="editor">
+        {/* ── TAB 3: Editor VSL ────────────────────────────────────────────── */}
+        {pestanaActiva === 'editor' && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -510,9 +544,9 @@ export default function VslGeneratorPage() {
 
               {bloques.length === 0 ? (
                 /* Estado vacío */
-                <div className="rounded-2xl border border-border bg-card p-12 text-center">
-                  <div className="w-14 h-14 rounded-full bg-[#4A90D9]/10 border border-[#4A90D9]/20 flex items-center justify-center mx-auto mb-4">
-                    <FileText size={22} className="text-[#4A90D9]/60" />
+                <div className="rounded-2xl border border-border bg-card p-12 text-center premium-border">
+                  <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
+                    <FileText size={22} className="text-primary/60" />
                   </div>
                   <h3 className="text-base font-semibold text-foreground/60 mb-2">
                     El guion aún no fue generado
@@ -613,9 +647,7 @@ export default function VslGeneratorPage() {
                 </div>
               )}
             </motion.div>
-          </TabsContent>
-
-        </Tabs>
+        )}
       </main>
 
       <TeleprompterModal 
